@@ -69,17 +69,28 @@ class FrameExtractor:
         return not (np.bitwise_xor(frame1[h//2-10:h//2+10, w//2-10:w//2+10, :],
                                    frame2[h//2-10:h//2+10, w//2-10:w//2+10, :]).any())
 
-
-    @staticmethod
-    def get_border(img):
+    def get_border(self, img):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
 
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cnt = contours[0]
-        x, y, w, h = cv2.boundingRect(cnt)
+        largest_index = self.get_largest_contour_index(contours)
 
+        x, y, w, h = cv2.boundingRect(contours[largest_index])
         return x, y, w, h
+
+    @staticmethod
+    def get_largest_contour_index(contours):
+        largest = 0
+        largest_index = 0
+        for index, cnt in enumerate(contours):
+            x, y, w, h = cv2.boundingRect(cnt)
+            size = w * h
+            if size > largest:
+                largest = size
+                largest_index = index
+
+        return largest_index
 
     @staticmethod
     def crop_border(img, border):

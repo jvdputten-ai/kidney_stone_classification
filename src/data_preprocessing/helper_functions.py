@@ -1,5 +1,3 @@
-import os
-
 
 def add_leading_zeros(number: str, length=4):
     filled = number.zfill(length)
